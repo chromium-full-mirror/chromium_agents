@@ -1,12 +1,12 @@
 {
-	"lucicfg": "1.46.2",
+	"lucicfg": "1.46.3",
 	"packages": [
 		{
 			"name": "@chromium-agents",
 			"deps": [
 				"@chromium-luci"
 			],
-			"lucicfg": "1.46.1",
+			"lucicfg": "1.46.3",
 			"entrypoints": [
 				"main.star"
 			]

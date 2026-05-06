@@ -17,7 +17,7 @@ PROJECT_LOGO = "https://storage.googleapis.com/chrome-infra-public/logo/chromium
 RECIPE_CIPD_PACKAGE = "infra/recipe_bundles/chromium.googlesource.com/chromium/tools/build"
 RECIPE_NAME = "presubmit"
 
-lucicfg.check_version("1.46.1", "Please update depot_tools")
+lucicfg.check_version("1.46.3", "Please update depot_tools")
 
 # Use LUCI Scheduler BBv2 names and add Scheduler realms configs.
 lucicfg.enable_experiment("crbug.com/1182002")
@@ -163,7 +163,7 @@ luci.builder(
     },
     dimensions = {
         "cpu": "x86-64",
-        "os": os.LINUX_JAMMY.get_dimension("try", "chromium-agents-presubmit"),
+        "os": os.LINUX_NOBLE.get_dimension("try", "chromium-agents-presubmit"),
         "pool": "luci.flex.try"
     },
     build_numbers = True,

@@ -6,7 +6,7 @@
 
 pkg.declare(
     name = "@chromium-agents",
-    lucicfg = "1.46.1",
+    lucicfg = "1.46.3",
 )
 
 pkg.options.lint_checks([
