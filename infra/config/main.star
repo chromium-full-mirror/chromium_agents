@@ -15,7 +15,7 @@ PROJECT_REPO = "https://chromium.googlesource.com/chromium/agents"
 # TODO(crbug.com/1457690): Update this when/if you get a custom logo.
 PROJECT_LOGO = "https://storage.googleapis.com/chrome-infra-public/logo/chromium.svg"
 RECIPE_CIPD_PACKAGE = "infra/recipe_bundles/chromium.googlesource.com/chromium/tools/build"
-RECIPE_NAME = "presubmit"
+RECIPE_NAME = "run_presubmit"
 
 lucicfg.check_version("1.46.3", "Please update depot_tools")
 
@@ -154,12 +154,6 @@ luci.builder(
     bucket = "try",
     executable = RECIPE_NAME,
     service_account = "chromium-try-builder@chops-service-accounts.iam.gserviceaccount.com",
-    properties = {
-        "$depot_tools/presubmit": {
-            "runhooks": True,
-            "timeout_s": 600,
-        },
-    },
     dimensions = {
         "cpu": "x86-64",
         "os": os.LINUX_NOBLE.get_dimension("try", "chromium-agents-presubmit"),
