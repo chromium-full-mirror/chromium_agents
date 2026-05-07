@@ -1,0 +1,6 @@
+.agents/
+/.vs/
+# Visual Studio Code
+.vscode/
+
+*.pyc
