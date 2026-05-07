@@ -155,7 +155,6 @@ luci.builder(
     executable = RECIPE_NAME,
     service_account = "chromium-try-builder@chops-service-accounts.iam.gserviceaccount.com",
     properties = {
-        "repo_name": "agents",
         "$depot_tools/presubmit": {
             "runhooks": True,
             "timeout_s": 600,
