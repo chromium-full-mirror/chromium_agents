@@ -61,13 +61,16 @@ process more granular and flexible:
   For formatting errors, run `git cl format` to automatically apply Chromium
   style formatting to your changes, then amend your CL.
 
+> [!IMPORTANT] **Format Before Uploading**: Always run `git cl format` before
+> uploading. If it makes any changes, commit them before proceeding with the
+> upload.
+
 - **Skip hooks**: `git cl upload --bypass-hooks` Use this to bypass pre-upload
   hooks. Use this only when necessary (e.g., when hooks are failing due to known
   issues and you need to upload anyway).
 
-- **Set title**: `git cl upload -t "Title of the CL"` Use this to set the title
-  of the CL directly from the command line. (Note: `-m` is deprecated in favor
-  of `-t` or `--title`).
+- **Skip Title Prompt**: Use `git cl upload -T` to skip the interactive title
+  prompt and use the most recent commit message as the title of the patchset.
 
 - **Set description**:
   `git cl upload --commit-description="Detailed description"` Use this to set
@@ -79,6 +82,10 @@ process more granular and flexible:
 
 - **Squash commits**: `git cl upload --squash` Use this to squash multiple local
   commits into a single CL.
+
+- **Skip Editor with `GIT_EDITOR=true`**: Setting `GIT_EDITOR=true` before the
+  command helps skip the interactive description editing step, which might
+  otherwise hang if no TTY is available or if an editor is not configured.
 
 You should select the minimal set of flags necessary for your task. For a full
 list of options, you can run `git cl upload --help`.
