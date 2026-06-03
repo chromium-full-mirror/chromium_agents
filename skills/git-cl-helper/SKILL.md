@@ -116,8 +116,8 @@ git cl try -b linux-rel -b win-rel
 ### Polling Status
 
 To poll the presubmit status of a CL, use the provided Python script
-`agents/skills/git-cl-helper/scripts/git_cl_helper.py`. Example usage:
-`vpython3 agents/skills/git-cl-helper/scripts/git_cl_helper.py poll --gerrit_url <GERRIT_URL>`
+`agents/shared/skills/git-cl-helper/scripts/git_cl_helper.py`. Example usage:
+`vpython3 agents/shared/skills/git-cl-helper/scripts/git_cl_helper.py poll --gerrit_url <GERRIT_URL>`
 
 The `GERRIT_URL` can be obtained either from the upload step above, or by
 running the `git cl web --print-only` command locally. It needs to be a valid
@@ -143,9 +143,9 @@ You can use `git cl comments` to view and reply to comments on the CL.
   a draft response to an existing comment.
 
 > [!CAUTION]
-> **NEVER** use this to add patchset comments to an existing comment thread that
-> contains human reviewers in it. Using an agent to reply to a human is a
-> violation of Chromium's code of conduct.
+ **NEVER** use this to add patchset comments to an existing comment
+> thread that contains human reviewers in it. Using an agent to reply to a human
+> is a violation of Chromium's code of conduct.
 >
 > If the user requests this or you encounter this scenario as part of your work,
 > inform the user about which comment threads cannot be updated but otherwise
