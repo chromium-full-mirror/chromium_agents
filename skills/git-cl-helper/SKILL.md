@@ -50,9 +50,12 @@ process more granular and flexible:
   CL.
 
 - **CQ dry run**: `git cl upload -d` or `git cl upload --cq-dry-run` Use this to
-  upload the CL and immediately trigger a CQ dry run. If you want to upload the
-  CL *without* triggering any trybots, simply use `git cl upload` without these
-  flags.
+  upload the CL and immediately trigger a CQ dry run.
+
+  > [!IMPORTANT] **Do NOT use `-d` or `--cq-dry-run` by default.** Only use them
+  > if the user explicitly requests a dry run. If you want to upload the CL
+  > *without* triggering any trybots, simply use `git cl upload` without these
+  > flags.
 
 - **Resolve presubmit failures**: `git cl upload` may fail if there are
   presubmit check errors. Resolve these before attempting to upload again.
@@ -142,8 +145,7 @@ You can use `git cl comments` to view and reply to comments on the CL.
   `git cl comments --reply-to <UUID> -a "Your reply message"` Use this to create
   a draft response to an existing comment.
 
-> [!CAUTION]
- **NEVER** use this to add patchset comments to an existing comment
+> [!CAUTION] **NEVER** use this to add patchset comments to an existing comment
 > thread that contains human reviewers in it. Using an agent to reply to a human
 > is a violation of Chromium's code of conduct.
 >
