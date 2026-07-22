@@ -194,6 +194,29 @@ class WrapLinesTest(unittest.TestCase):
                     Change-Id: I123456
                 """,
             },
+            {
+                "name":
+                "obsolete_histogram_tag_single_line",
+                "draft":
+                """
+                    [Comp] Subject
+                    Some description text explaining the rationale for the changes.
+
+                    OBSOLETE_HISTOGRAM[Tab.VeryLongHistogramName]=Replaced by Tab.AnotherLongHistogramName2 because the original metric is no longer needed.
+                    Bug: 123456
+                    Test: manual verification
+                """,
+                "final":
+                """
+                    [Comp] Subject
+
+                    Some description text explaining the rationale for the changes.
+
+                    OBSOLETE_HISTOGRAM[Tab.VeryLongHistogramName]=Replaced by Tab.AnotherLongHistogramName2 because the original metric is no longer needed.
+                    Bug: 123456
+                    Test: manual verification
+                """,
+            },
         ]
 
         for tc in test_cases:

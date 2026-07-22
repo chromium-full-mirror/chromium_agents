@@ -22,6 +22,7 @@ def wrap_text(text, width=72):
 
     wrapped_blocks = []
     paragraphs = re.split(r'\n\n+', body)
+    footer_re = r'^\w+[A-Za-z0-9_\-]*(?:\[[^\]]+\])?[:=]'
     for p in paragraphs:
         if not p.strip():
             continue
@@ -31,7 +32,7 @@ def wrap_text(text, width=72):
             # Check if line starts a bullet point
             is_bullet = bool(re.match(r'^\s*(?:[-*+]|\d+[.)])\s+', line))
             # Check if line starts a footer or tag
-            is_footer = bool(re.match(r'^[A-Za-z0-9_-]+:(?:\s|$)|\w+=', line))
+            is_footer = bool(re.match(footer_re, line))
 
             if not items or is_bullet or is_footer:
                 items.append([line])
@@ -56,6 +57,9 @@ def wrap_text(text, width=72):
                     break_long_words=False,
                     break_on_hyphens=False)
                 wrapped_items.append(wrapper.fill(cleaned_content))
+            elif re.match(footer_re, item_str):
+                # Footer tags must remain on a single line.
+                wrapped_items.append(' '.join(item_str.split()))
             else:
                 cleaned_content = ' '.join(item_str.split())
                 wrapper = textwrap.TextWrapper(width=width,
