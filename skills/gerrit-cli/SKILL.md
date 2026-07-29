@@ -21,7 +21,7 @@ depot_tools.
   stop execution immediately.
 - Use the wrapper script directly instead of an environment variable.
   Substitute:
-  `python3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py`
+  `vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py`
   as the executable command in all examples and invocations.
 
 ## Just-in-Time (JiT) Loading Guidance

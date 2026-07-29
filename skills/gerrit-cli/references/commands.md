@@ -2,8 +2,8 @@
 
 Run the tool directly using the wrapper script path with the `--help` flag:
 
-- `python3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py --help`
-- `python3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py changes --help`
+- `vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py --help`
+- `vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py changes --help`
 
 ## Global Flags
 
@@ -22,7 +22,7 @@ ______________________________________________________________________
 - **Query active changes:**
 
   ```bash
-  python3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+  vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
     changes \
     --host https://chromium-review.googlesource.com \
     --query "owner:self status:open"
@@ -34,7 +34,7 @@ ______________________________________________________________________
   stdout redirection (`>`).
 
   ```bash
-  python3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+  vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
     content \
     --host https://chromium-review.googlesource.com \
     --project <project> \
@@ -47,56 +47,55 @@ ______________________________________________________________________
 - **Get related changes:**
 
   ```bash
-  python3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+  vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
     relatedchanges \
     --host https://chromium-review.googlesource.com \
-    <change_id> <revision>
+    --change <change_id> --revision <revision>
   ```
 
 ### 2. Reviewing and Voting
 
 - **Add a patchset-level comment:**
   ```bash
-  python3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+  vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
     addpatchsetcomment \
     --host https://chromium-review.googlesource.com \
-    --message "Review findings: <message>" \
-    <change_id> <revision>
+    --change <change_id> --revision <revision> \
+    --message "Review findings: <message>"
   ```
 - **Vote on a review label (e.g., Code-Review +1):**
   ```bash
-  python3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+  vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
     setlabel \
     --host https://chromium-review.googlesource.com \
-    --label "Code-Review" \
-    --value 1 \
-    <change_id>
+    --change <change_id> \
+    --label Code-Review 1
   ```
 
 ### 3. Actions and Shepherding
 
 - **Submit/Merge a change:**
   ```bash
-  python3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+  vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
     submitchange \
     --host https://chromium-review.googlesource.com \
-    <change_id>
+    --change <change_id>
   ```
 - **Abandon a change:**
   ```bash
-  python3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+  vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
     abandon \
     --host https://chromium-review.googlesource.com \
-    --message "<reason>" \
-    <change_id>
+    --change <change_id> \
+    --message "<reason>"
   ```
 - **Restore an abandoned change:**
   ```bash
-  python3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+  vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
     restore \
     --host https://chromium-review.googlesource.com \
-    --message "<reason>" \
-    <change_id>
+    --change <change_id> \
+    --message "<reason>"
   ```
 
 ______________________________________________________________________
@@ -106,9 +105,32 @@ ______________________________________________________________________
 Explore the built-in CLI help for additional subcommands or advanced syntax:
 
 - Display all top-level commands:
-  `python3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py --help`
+  `vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py --help`
 - Display help for a specific subcommand:
   ```bash
-  python3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+  vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
     help <command>
   ```
+
+
+## Advanced / Escape Hatch: Arbitrary REST API Calls (`rawapi`)
+
+If the built-in subcommands do not cover a specific action or metadata query, you can use the `rawapi` subcommand to execute arbitrary HTTP requests against the Gerrit REST API.
+
+- **Endpoint Reference**: [Gerrit REST API - Changes](https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html)
+
+### Usage
+
+```bash
+vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+  rawapi \
+  --host https://chromium-review.googlesource.com \
+  --path "/changes/<change_id>/detail?o=SUBMITTABLE" \
+  --json_file output.json
+```
+
+- **Options**:
+  - `--path`: HTTP path of the API endpoint (e.g. `/changes/<change_id>/revisions/current/mergeable`).
+  - `--method`: HTTP method (GET, POST, PUT, DELETE). Defaults to GET.
+  - `--body`: JSON string body for write requests (e.g., POST/PUT).
+  - `--accept_status`: Comma-separated list of successful HTTP status codes.
