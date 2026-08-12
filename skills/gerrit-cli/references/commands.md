@@ -28,6 +28,19 @@ ______________________________________________________________________
     --query "owner:self status:open"
   ```
 
+- **Get published file and line comments across patchsets:**
+
+  ```bash
+  vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+    comments \
+    --host https://chromium-review.googlesource.com \
+    --change <change_id> \
+    --json_file <path>
+  ```
+
+  This writes the unchanged structured Gerrit JSON to `--json_file`. Filtering,
+  threading, and presentation are the caller's responsibility.
+
 - **View the content of a specific file in a change:**
 
   **Note:** This command does not work with the `--json_file` flag, instead use
@@ -42,6 +55,23 @@ ______________________________________________________________________
     --revision <revision> \
     --path <file_path> \
     > output_file
+  ```
+
+- **Get a formatted patch for a change:**
+
+  `--revision <revision>` is optional and defaults to `current`. Use the
+  optional `--path <file_path>`, `--parent <parent_number>`, and
+  `--context <lines>` flags to customize the patch.
+
+  **Note:** Decoded formatted patch bytes are written to stdout, so redirect
+  them to a file (`>`). The `--json_file` flag is not used for patch bytes.
+
+  ```bash
+  vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+    patch \
+    --host https://chromium-review.googlesource.com \
+    --change <change_id> \
+    > output.patch
   ```
 
 - **Get related changes:**
@@ -112,12 +142,14 @@ Explore the built-in CLI help for additional subcommands or advanced syntax:
     help <command>
   ```
 
-
 ## Advanced / Escape Hatch: Arbitrary REST API Calls (`rawapi`)
 
-If the built-in subcommands do not cover a specific action or metadata query, you can use the `rawapi` subcommand to execute arbitrary HTTP requests against the Gerrit REST API.
+If the built-in subcommands do not cover a specific action or metadata query,
+you can use the `rawapi` subcommand to execute arbitrary HTTP requests against
+the Gerrit REST API.
 
-- **Endpoint Reference**: [Gerrit REST API - Changes](https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html)
+- **Endpoint Reference**:
+  [Gerrit REST API - Changes](https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html)
 
 ### Usage
 
@@ -130,7 +162,8 @@ vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
 ```
 
 - **Options**:
-  - `--path`: HTTP path of the API endpoint (e.g. `/changes/<change_id>/revisions/current/mergeable`).
+  - `--path`: HTTP path of the API endpoint (e.g.
+    `/changes/<change_id>/revisions/current/mergeable`).
   - `--method`: HTTP method (GET, POST, PUT, DELETE). Defaults to GET.
   - `--body`: JSON string body for write requests (e.g., POST/PUT).
   - `--accept_status`: Comma-separated list of successful HTTP status codes.
