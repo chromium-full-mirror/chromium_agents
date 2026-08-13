@@ -12,9 +12,13 @@ USE_PYTHON3 = True
 PRESUBMIT_VERSION = '2.0.0'
 
 
-
 def CheckPatchFormatted(input_api, output_api):
-    return input_api.canned_checks.CheckPatchFormatted(input_api, output_api)
+    return input_api.canned_checks.CheckPatchFormatted(
+        input_api,
+        output_api,
+        result_factory=output_api.PresubmitError,
+        bypass_warnings=False,
+    )
 
 
 def CheckPylint(input_api, output_api):

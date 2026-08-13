@@ -41,14 +41,18 @@ def _find_vpython(client):
 def main():
     client = _find_on_path('gerrit_client.py')
     if not client:
-        print('gerrit_client.py not found. '
-              'Is depot_tools available and added to PATH?')
+        print(
+            'gerrit_client.py not found. '
+            'Is depot_tools available and added to PATH?'
+        )
         return 1
 
     vpython = _find_vpython(client)
     if not Path(vpython).is_file() and sys.platform == 'win32':
-        print('vpython3 executable not found. '
-              'Is depot_tools available and added to PATH?')
+        print(
+            'vpython3 executable not found. '
+            'Is depot_tools available and added to PATH?'
+        )
         return 1
 
     return subprocess.call([vpython, client] + sys.argv[1:])

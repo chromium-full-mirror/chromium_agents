@@ -3,6 +3,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 """Wraps text to 72 characters per line for CL descriptions."""
+
 import fileinput
 import re
 import textwrap
@@ -42,8 +43,9 @@ def wrap_text(text, width=72):
         wrapped_items = []
         for item_lines in items:
             item_str = '\n'.join(item_lines)
-            bullet_match = re.match(r'^(\s*(?:[-*+]|\d+[.)])\s+)(.*)',
-                                    item_str, re.DOTALL)
+            bullet_match = re.match(
+                r'^(\s*(?:[-*+]|\d+[.)])\s+)(.*)', item_str, re.DOTALL
+            )
             if bullet_match:
                 marker = bullet_match.group(1)
                 content = bullet_match.group(2)
@@ -55,16 +57,17 @@ def wrap_text(text, width=72):
                     initial_indent=marker,
                     subsequent_indent=subsequent_indent,
                     break_long_words=False,
-                    break_on_hyphens=False)
+                    break_on_hyphens=False,
+                )
                 wrapped_items.append(wrapper.fill(cleaned_content))
             elif re.match(footer_re, item_str):
                 # Footer tags must remain on a single line.
                 wrapped_items.append(' '.join(item_str.split()))
             else:
                 cleaned_content = ' '.join(item_str.split())
-                wrapper = textwrap.TextWrapper(width=width,
-                                               break_long_words=False,
-                                               break_on_hyphens=False)
+                wrapper = textwrap.TextWrapper(
+                    width=width, break_long_words=False, break_on_hyphens=False
+                )
                 wrapped_items.append(wrapper.fill(cleaned_content))
 
         wrapped_blocks.append('\n'.join(wrapped_items))

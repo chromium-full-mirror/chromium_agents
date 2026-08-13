@@ -21,15 +21,15 @@ import code_explorer
 
 
 class TestHandleViewCl(unittest.TestCase):
-
     def setUp(self):
         self.mock_run_patcher = mock.patch('subprocess.run')
         self.mock_run = self.mock_run_patcher.start()
         self.addCleanup(self.mock_run_patcher.stop)
 
     def test_success(self):
-        args = argparse.Namespace(revision='my-rev',
-                                  cwd=pathlib.Path('/my/cwd'))
+        args = argparse.Namespace(
+            revision='my-rev', cwd=pathlib.Path('/my/cwd')
+        )
         code_explorer._handle_view_cl(args)
 
         self.mock_run.assert_called_once_with(
@@ -40,7 +40,6 @@ class TestHandleViewCl(unittest.TestCase):
 
 
 class TestHandleViewFile(unittest.TestCase):
-
     def setUp(self):
         self.mock_run_patcher = mock.patch('subprocess.run')
         self.mock_run = self.mock_run_patcher.start()
@@ -62,7 +61,8 @@ class TestHandleViewFile(unittest.TestCase):
 
     def test_file_not_found(self):
         self.mock_run.side_effect = subprocess.CalledProcessError(
-            1, 'git cat-file')
+            1, 'git cat-file'
+        )
         args = argparse.Namespace(
             revision='my-rev',
             path=pathlib.Path('my/file.py'),
@@ -79,11 +79,11 @@ class TestHandleViewFile(unittest.TestCase):
         )
         self.assertEqual(
             f.getvalue(),
-            'File my/file.py does not appear to exist at revision my-rev\n')
+            'File my/file.py does not appear to exist at revision my-rev\n',
+        )
 
 
 class TestHandleListDir(unittest.TestCase):
-
     def setUp(self):
         self.mock_run_patcher = mock.patch('subprocess.run')
         self.mock_run = self.mock_run_patcher.start()
@@ -92,7 +92,8 @@ class TestHandleListDir(unittest.TestCase):
     def test_success(self):
         mock_proc = mock.Mock()
         mock_proc.stdout = (
-            'blob:my/dir/file1.py\ntree:my/dir/subdir\nblob:my/dir/file2.py\n')
+            'blob:my/dir/file1.py\ntree:my/dir/subdir\nblob:my/dir/file2.py\n'
+        )
         self.mock_run.return_value = mock_proc
 
         args = argparse.Namespace(
@@ -182,7 +183,6 @@ class TestHandleListDir(unittest.TestCase):
 
 
 class TestHandleSearchFiles(unittest.TestCase):
-
     def setUp(self):
         self.mock_run_patcher = mock.patch('subprocess.run')
         self.mock_run = self.mock_run_patcher.start()
@@ -203,8 +203,7 @@ class TestHandleSearchFiles(unittest.TestCase):
         )
 
     def test_no_matches(self):
-        self.mock_run.side_effect = subprocess.CalledProcessError(
-            1, 'git grep')
+        self.mock_run.side_effect = subprocess.CalledProcessError(1, 'git grep')
         args = argparse.Namespace(
             query='my-query',
             revision='my-rev',
@@ -221,7 +220,8 @@ class TestHandleSearchFiles(unittest.TestCase):
 
     def test_other_error(self):
         self.mock_run.side_effect = subprocess.CalledProcessError(
-            128, 'git grep')
+            128, 'git grep'
+        )
         args = argparse.Namespace(
             query='my-query',
             revision='my-rev',
@@ -232,11 +232,10 @@ class TestHandleSearchFiles(unittest.TestCase):
 
 
 class TestParseArgs(unittest.TestCase):
-
     def test_view_cl_required_args(self):
         with mock.patch.object(
-                sys, 'argv',
-            ['code_explorer.py', 'view_cl', '--revision', 'my-rev']):
+            sys, 'argv', ['code_explorer.py', 'view_cl', '--revision', 'my-rev']
+        ):
             args = code_explorer._parse_args()
             self.assertEqual(args.handler, code_explorer._handle_view_cl)
             self.assertEqual(args.revision, 'my-rev')
@@ -244,8 +243,8 @@ class TestParseArgs(unittest.TestCase):
 
     def test_view_cl_all_args(self):
         with mock.patch.object(
-                sys,
-                'argv',
+            sys,
+            'argv',
             [
                 'code_explorer.py',
                 'view_cl',
@@ -261,8 +260,8 @@ class TestParseArgs(unittest.TestCase):
 
     def test_view_file_required_args(self):
         with mock.patch.object(
-                sys,
-                'argv',
+            sys,
+            'argv',
             [
                 'code_explorer.py',
                 'view_file',
@@ -279,8 +278,8 @@ class TestParseArgs(unittest.TestCase):
 
     def test_list_dir_required_args(self):
         with mock.patch.object(
-                sys,
-                'argv',
+            sys,
+            'argv',
             [
                 'code_explorer.py',
                 'list_dir',
@@ -297,8 +296,8 @@ class TestParseArgs(unittest.TestCase):
 
     def test_search_files_required_args(self):
         with mock.patch.object(
-                sys,
-                'argv',
+            sys,
+            'argv',
             [
                 'code_explorer.py',
                 'search_files',
@@ -315,9 +314,10 @@ class TestParseArgs(unittest.TestCase):
 
     def test_missing_revision(self):
         # argparse will write to stderr and exit
-        with mock.patch.object(sys, 'argv',
-                               ['code_explorer.py', 'view_cl']), mock.patch(
-                                   'sys.stderr', new_callable=io.StringIO):
+        with (
+            mock.patch.object(sys, 'argv', ['code_explorer.py', 'view_cl']),
+            mock.patch('sys.stderr', new_callable=io.StringIO),
+        ):
             with self.assertRaises(SystemExit):
                 code_explorer._parse_args()
 

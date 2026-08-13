@@ -18,15 +18,16 @@ import gerrit_client_wrapper
 
 
 class GerritClientWrapperTest(fake_filesystem_unittest.TestCase):
-
     def setUp(self):
         self.setUpPyfakefs()
         self.which_patcher = mock.patch(
-            'gerrit_client_wrapper.shutil.which', return_value=None)
+            'gerrit_client_wrapper.shutil.which', return_value=None
+        )
         self.which_patcher.start()
         self.addCleanup(self.which_patcher.stop)
         self.call_patcher = mock.patch(
-            'gerrit_client_wrapper.subprocess.call', return_value=0)
+            'gerrit_client_wrapper.subprocess.call', return_value=0
+        )
         self.call_mock = self.call_patcher.start()
         self.addCleanup(self.call_patcher.stop)
 
@@ -38,7 +39,8 @@ class GerritClientWrapperTest(fake_filesystem_unittest.TestCase):
         with mock.patch.dict(os.environ, {'PATH': str(directory)}):
             self.assertEqual(
                 str(client),
-                gerrit_client_wrapper._find_on_path('gerrit_client.py'))
+                gerrit_client_wrapper._find_on_path('gerrit_client.py'),
+            )
 
     def test_main_uses_resolved_client_and_vpython_on_posix(self):
         client = Path.cwd() / 'depot_tools' / 'gerrit_client.py'
@@ -51,12 +53,14 @@ class GerritClientWrapperTest(fake_filesystem_unittest.TestCase):
         ):
             self.assertEqual(0, gerrit_client_wrapper.main())
 
-        self.call_mock.assert_called_once_with([
-            'vpython3',
-            str(client),
-            'changes',
-            '--help',
-        ])
+        self.call_mock.assert_called_once_with(
+            [
+                'vpython3',
+                str(client),
+                'changes',
+                '--help',
+            ]
+        )
 
     def test_main_bypasses_batch_launcher_on_windows(self):
         depot_tools = Path.cwd() / 'depot_tools'
@@ -74,7 +78,8 @@ class GerritClientWrapperTest(fake_filesystem_unittest.TestCase):
             self.assertEqual(0, gerrit_client_wrapper.main())
 
         self.call_mock.assert_called_once_with(
-            [str(executable), str(client)] + arguments)
+            [str(executable), str(client)] + arguments
+        )
 
     def test_main_does_not_fall_back_to_batch_launcher(self):
         depot_tools = Path.cwd() / 'depot_tools'
@@ -92,7 +97,8 @@ class GerritClientWrapperTest(fake_filesystem_unittest.TestCase):
         self.assertEqual(
             'vpython3 executable not found. '
             'Is depot_tools available and added to PATH?\n',
-            stdout.getvalue())
+            stdout.getvalue(),
+        )
 
 
 if __name__ == '__main__':

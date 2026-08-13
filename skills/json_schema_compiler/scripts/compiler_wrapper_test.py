@@ -13,7 +13,6 @@ from pyfakefs import fake_filesystem_unittest
 
 
 class CompilerWrapperTest(fake_filesystem_unittest.TestCase):
-
     def setUp(self):
         self.setUpPyfakefs()
 

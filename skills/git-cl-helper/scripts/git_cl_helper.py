@@ -31,8 +31,10 @@ def _fetch_build_error(cq_message):
                 if summary:
                     return summary[:3000]
         except Exception as e:
-            print(f"Failed to fetch build error for {build_id}: {e}",
-                  file=sys.stderr)
+            print(
+                f"Failed to fetch build error for {build_id}: {e}",
+                file=sys.stderr,
+            )
     return cq_message[:3000]
 
 
@@ -44,12 +46,15 @@ def _poll_gerrit(gerrit_url):
         sys.exit(1)
 
     change_num = m.group(1)
-    api_url = (f"https://chromium-review.googlesource.com/changes/{change_num}"
-               f"/detail?o=MESSAGES&o=CURRENT_REVISION")
+    api_url = (
+        f"https://chromium-review.googlesource.com/changes/{change_num}"
+        f"/detail?o=MESSAGES&o=CURRENT_REVISION"
+    )
 
     print(f"Polling Gerrit API: {api_url}")
-    req = urllib.request.Request(api_url,
-                                 headers={"Accept": "application/json"})
+    req = urllib.request.Request(
+        api_url, headers={"Accept": "application/json"}
+    )
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
             raw = resp.read().decode("utf-8")
@@ -66,7 +71,8 @@ def _poll_gerrit(gerrit_url):
         email = msg.get("author", {}).get("email", "")
 
         luci_email = (
-            "chromium-scoped@luci-project-accounts.iam.gserviceaccount.com")
+            "chromium-scoped@luci-project-accounts.iam.gserviceaccount.com"
+        )
         if luci_email not in email:
             continue
 
@@ -79,8 +85,10 @@ def _poll_gerrit(gerrit_url):
             detail = _fetch_build_error(text)
             return "failed", detail
 
-        if ("passed the run" in text_lower
-                or "this cl is ready to submit" in text_lower):
+        if (
+            "passed the run" in text_lower
+            or "this cl is ready to submit" in text_lower
+        ):
             return "passed", ""
 
         if "is trying" in text_lower or "dry run: cv" in text_lower:
@@ -100,13 +108,14 @@ def _do_poll(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Script for Gerrit CL operations.")
+        description="Script for Gerrit CL operations."
+    )
     subparsers = parser.add_subparsers(dest="action", required=True)
 
     poll_parser = subparsers.add_parser("poll")
-    poll_parser.add_argument("--gerrit_url",
-                             required=True,
-                             help="Gerrit CL URL")
+    poll_parser.add_argument(
+        "--gerrit_url", required=True, help="Gerrit CL URL"
+    )
 
     args = parser.parse_args()
 
