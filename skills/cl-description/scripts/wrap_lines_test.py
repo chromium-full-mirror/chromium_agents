@@ -185,6 +185,36 @@ class WrapLinesTest(unittest.TestCase):
                     Test: manual verification
                 """,
             },
+            {
+                "name":
+                "subject_ends_with_single_period",
+                "draft":
+                """
+                    [Comp] Subject with period.
+                    Some description.
+                """,
+                "final":
+                """
+                    [Comp] Subject with period
+
+                    Some description.
+                """,
+            },
+            {
+                "name":
+                "subject_ends_with_ellipsis",
+                "draft":
+                """
+                    [Comp] Subject with ellipsis...
+                    Some description.
+                """,
+                "final":
+                """
+                    [Comp] Subject with ellipsis...
+
+                    Some description.
+                """,
+            },
         ]
 
         for tc in test_cases:

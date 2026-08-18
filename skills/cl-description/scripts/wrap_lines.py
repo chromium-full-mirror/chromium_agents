@@ -9,14 +9,21 @@ import re
 import textwrap
 
 
+def _strip_trailing_period(text):
+    """When the text ends with a single period, remove it."""
+    if text.endswith('.') and not text.endswith('..'):
+        return text[:-1]
+    return text
+
+
 def wrap_text(text, width=72):
     if not text.strip():
-        return ""
+        return ''
 
     # Separate subject and body
     parts = text.split('\n', 1)
-    subject = parts[0].strip()
-    body = parts[1].strip() if len(parts) > 1 else ""
+    subject = _strip_trailing_period(parts[0].strip())
+    body = parts[1].strip() if len(parts) > 1 else ''
 
     if not body:
         return subject
@@ -73,9 +80,9 @@ def wrap_text(text, width=72):
         wrapped_blocks.append('\n'.join(wrapped_items))
 
     formatted_body = '\n\n'.join(wrapped_blocks)
-    return f"{subject}\n\n{formatted_body}"
+    return f'{subject}\n\n{formatted_body}'
 
 
-if __name__ == "__main__":
-    input_text = "".join(fileinput.input())
+if __name__ == '__main__':
+    input_text = ''.join(fileinput.input())
     print(wrap_text(input_text))
