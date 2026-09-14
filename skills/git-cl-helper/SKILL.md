@@ -25,10 +25,12 @@ and polling presubmit results to verify local changes.
 Before uploading a CL, you must commit your local changes. Follow these steps to
 create a commit:
 
-1. **Stage changes**: Use `git add <files>` to stage the files you want to
+1. **Ensure branch upstream is set**: The `git cl` tools rely on an upstream
+   branch being set (e.g. `git branch --set-upstream-to=origin/main`).
+2. **Stage changes**: Use `git add <files>` to stage the files you want to
    include in the commit.
    - Use `git add -u` to stage all modified files that are already tracked.
-2. **Create commit**: Use `git commit` to create a commit.
+3. **Create commit**: Use `git commit` to create a commit.
    - It is recommended to use `git commit -m "Commit message"` to specify the
      message directly.
    - The first line should be a short summary (up to 72 characters).
@@ -75,10 +77,15 @@ process more granular and flexible:
 - **Skip Title Prompt**: Use `git cl upload -T` to skip the interactive title
   prompt and use the most recent commit message as the title of the patchset.
 
-- **Set description**:
-  `git cl upload --commit-description="Detailed description"` Use this to set
-  the full description of the CL. You can also use `--edit-description` to open
-  an editor and modify the description interactively before uploading.
+- **Set or update CL description**:
+
+  - **Initial upload**: `git cl upload` automatically uses the git commit
+    description (do not pass `--title`). Alternatively the commit message can be
+    set like so: `git cl upload --commit-description="Detailed description"`.
+  - **Existing CL**: The git commit is not used when uploading new patchsets to
+    Gerrit; the description must be explicitly updated. Run
+    `git cl description -n +` to set the Gerrit description from the latest git
+    commit.
 
 - **Add Reviewers**: `git cl upload -r "reviewer@chromium.org"` Use this to add
   reviewers when uploading the CL. You can specify this flag multiple times.

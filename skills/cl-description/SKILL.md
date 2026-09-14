@@ -13,7 +13,18 @@ description. Ensure that all the constraints specified in the template are met.
 Because LLMs cannot reliably hard-wrap text at precisely 72 characters, you
 **MUST** mathematically format your draft before presenting the final response.
 Use the provided Python script
-`agents/shared/skills/cl-description/scripts/wrap_lines.py` via your execution tools.
-Pre-requisite: Save your draft to a file (e.g. `draft.txt`). Example usage:
-`vpython3 agents/shared/skills/cl-description/scripts/wrap_lines.py draft.txt` Final
-output should be the code block containing the mathematically formatted text.
+`agents/shared/skills/cl-description/scripts/wrap_lines.py` via your execution
+tools. Pre-requisite: Save your draft to a file (e.g. `draft.txt`). Example
+usage:
+`vpython3 agents/shared/skills/cl-description/scripts/wrap_lines.py draft.txt`
+Final output should be the code block containing the mathematically formatted
+text.
+
+### Applying the CL Description to Gerrit
+
+See `git-cl-helper` for uploading:
+
+- **Initial upload**: `git cl upload` uses the git commit description (do not
+  pass `--title`).
+- **Existing CL**: Run `git cl description -n +` to set the Gerrit description
+  from the latest git commit.
