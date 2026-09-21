@@ -74,8 +74,17 @@ process more granular and flexible:
   hooks. Use this only when necessary (e.g., when hooks are failing due to known
   issues and you need to upload anyway).
 
+- **Set patchset title**: Use `git cl upload -t "Short summary"` (or
+  `--title="..."`) to set a short description for the patchset in Gerrit. This
+  is used to summarize the changes in this specific patchset (e.g., "Address
+  reviewer comments" or "Fix lint errors"). It is typically used for subsequent
+  uploads after the initial one to help reviewers track changes. **Using `-t`
+  (or `-T`) also avoids interactive prompts that can hang the agent.**
+
 - **Skip Title Prompt**: Use `git cl upload -T` to skip the interactive title
   prompt and use the most recent commit message as the title of the patchset.
+  **Use this if you do not need a custom title and want to avoid interactive
+  prompts.**
 
 - **Set or update CL description**:
 
