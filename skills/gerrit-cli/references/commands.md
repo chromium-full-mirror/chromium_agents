@@ -41,6 +41,23 @@ ______________________________________________________________________
   This writes the unchanged structured Gerrit JSON to `--json_file`. Filtering,
   threading, and presentation are the caller's responsibility.
 
+- **Get automated check runs and findings for a patchset:**
+
+  ```bash
+  vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+    checks \
+    --host https://chromium-review.googlesource.com \
+    --change <change_id> \
+    --revision <revision> \
+    --json_file <path>
+  ```
+
+  `--change` is required. `--revision` is optional and defaults to `current`.
+  This writes the unchanged JSON array of check runs to `--json_file`.
+
+  Requires Gerrit's Findings plugin. This does not include all try-job results;
+  empty findings do not mean all try jobs passed.
+
 - **View the content of a specific file in a change:**
 
   **Note:** This command does not work with the `--json_file` flag, instead use
