@@ -102,7 +102,20 @@ ______________________________________________________________________
 
 ### 2. Reviewing and Voting
 
-- **Add a patchset-level comment:**
+- **Create a draft comment (patchset-level, line-level, or reply):**
+  ```bash
+  vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+    rawapi \
+    --host https://chromium-review.googlesource.com \
+    --path "/changes/<change_id>/revisions/<revision>/drafts" \
+    --method PUT \
+    --accept_status 200,201 \
+    --body '{"path": "/PATCHSET_LEVEL", "message": "Review findings: <message>"}'
+  ```
+  *(For line comments or replies, set `"path": "<file_path>"`, `"line": <line>`,
+  and/or `"in_reply_to": "<comment_id>"` in `--body`.)*
+- **Add a published patchset-level comment (only when no non-author humans are
+  involved):**
   ```bash
   vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
     addpatchsetcomment \

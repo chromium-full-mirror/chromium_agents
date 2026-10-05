@@ -161,10 +161,8 @@ You can use `git cl comments` to view and reply to comments on the CL.
   `git cl comments --reply-to <UUID> -a "Your reply message"` Use this to create
   a draft response to an existing comment.
 
-> [!CAUTION] **NEVER** use this to add patchset comments to an existing comment
-> thread that contains human reviewers in it. Using an agent to reply to a human
-> is a violation of Chromium's code of conduct.
->
-> If the user requests this or you encounter this scenario as part of your work,
-> inform the user about which comment threads cannot be updated but otherwise
-> continue work.
+> [!CAUTION] **NEVER** publish comments or directly reply (e.g. with `--publish`
+> or without `--reply-to`) if non-author human reviewers have commented on the
+> CL. Using an agent to autonomously reply to a human is a violation of
+> Chromium's code of conduct. Instead, only create draft comments and ask the
+> user to review and post them.

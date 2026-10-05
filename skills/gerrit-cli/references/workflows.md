@@ -23,14 +23,18 @@ provided with a link or ID:
    ```
 3. **Analyze Local Modifications**: Inspect the fetched contents and local diffs
    for any logic or formatting issues.
-4. **Add Review Comment**: Post a patchset-level comment containing the review
-   findings:
+4. **Add Draft Review Comment**: Create a draft comment containing the review
+   findings and ask the user to review and post it in Gerrit (never publish
+   comments directly with `addpatchsetcomment` if non-author humans are
+   involved):
    ```bash
    vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
-     addpatchsetcomment \
+     rawapi \
      --host https://chromium-review.googlesource.com \
-     --change <change_id> --revision current \
-     --message "Review findings: ..."
+     --path "/changes/<change_id>/revisions/current/drafts" \
+     --method PUT \
+     --accept_status 200,201 \
+     --body '{"path": "/PATCHSET_LEVEL", "message": "Review findings: ..."}'
    ```
 
 ## 2. Shepherding & Submission Workflow

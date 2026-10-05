@@ -72,10 +72,9 @@ depot_tools.
 - **Use JSON Output**: Always use the `--json_file=<path>` flag when querying
   changes or fetching metadata to obtain structured, machine-readable output.
 
-> [!CAUTION] **NEVER** use this to add patchset comments to an existing comment
-> thread that contains human reviewers in it. Using an agent to reply to a human
-> is a violation of Chromium's code of conduct.
->
-> If the user requests this or you encounter this scenario as part of your work,
-> inform the user about which comment threads cannot be updated but otherwise
-> continue work.
+> [!CAUTION] **NEVER** publish comments or messages (e.g. `addpatchsetcomment`,
+> `addMessage`, or via `rawapi`) or directly reply to comments if non-author
+> human reviewers have commented on the CL. Using an agent to autonomously reply
+> to a human is a violation of Chromium's code of conduct. Instead, create draft
+> comments (e.g. via `rawapi` or `git cl comments --reply-to`) and ask the user
+> to review and post them.
