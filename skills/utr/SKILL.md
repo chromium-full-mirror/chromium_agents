@@ -33,12 +33,15 @@ farm and output the final aggregated results URL before exiting.*
 
 - `-B <bucket>`: The bucket name (e.g., `ci` or `try`).
 - `-b <builder>`: The builder name (e.g., `Linux Tests`, `Win10 Tests x64`).
-- `-t <test_suite>`: The test suite to run (e.g., `viz_unittests`, `url_unittests`).
+- `-t <test_suite>`: The test suite to run (e.g., `viz_unittests`,
+  `url_unittests`).
 - `--build-dir <dir>` or `-o <dir>`: The build directory to use for compiling
   and invoking test targets. Will use a build dir in `//out/` named after the
   builder if not specified: `//out/UTR${{builder_name}}`
-- `--force` or `-f`: Skip all prompts about config mismatches especially useful
-  when cross-compiling or using a custom build directory.
+- `--force` or `-f`: Takes every config-mismatch prompt's default, silently
+  skipping the checks below. Don't use it unless the user explicitly asks.
+- `--keep-gn-args` / `--overwrite-gn-args`: If the local `args.gn` differs from
+  the builder's, keep it or replace it with the builder's args.
 - `-n N`: Runs the build/test command N times without cleaning the build dir,
   and exits on the first failure.
 - `--no-rbe`: Disables remote execution (RBE) and forces local compilation.
@@ -67,9 +70,9 @@ issues:
    luci-auth login -scopes https://www.googleapis.com/auth/userinfo.email
    ```
 2. **Forcing Narrow Execution Scope:** Avoid broad isolation failures by always
-   supplying specific test targets and the force flag:
+   supplying specific test targets:
    ```sh
-   vpython3 tools/utr/run.py --force -t <test_suite> -p chromium -B try -b <builder> compile
+   vpython3 tools/utr/run.py -t <test_suite> -p chromium -B try -b <builder> compile
    ```
 3. **Missing Target OS Toolchains (e.g., Android/iOS):** If GN generation fails
    with `Missing native Android toolchain support` (or similar `target_os`
@@ -86,7 +89,7 @@ issues:
    files (e.g., `build/util/LASTCHANGE.dummy`), pass `--no-rbe` to force local
    execution where the files are successfully present:
    ```sh
-   vpython3 tools/utr/run.py --no-rbe --force -p chromium -B ci -b <builder> -t <test> compile-and-test
+   vpython3 tools/utr/run.py --no-rbe -p chromium -B ci -b <builder> -t <test> compile-and-test
    ```
 
 ## Guidelines for AI Agents (User Interaction & Prompts)
@@ -94,31 +97,26 @@ issues:
 When invoking UTR as an AI agent, you must follow these guidelines to ensure a
 safe and smooth user experience:
 
-### 1. Present Warnings Before Prompts
+### 1. Config-Mismatch Warnings
 
-If UTR stops and prompts for input (e.g., expecting `y` to continue or `i` to
-ignore), **DO NOT** simply ask the user "Should I proceed?".
+UTR doesn't prompt AI agents. When it finds a config mismatch, it prints the
+warning and aborts, saying how to proceed:
 
-1. Read the UTR command logs to identify the specific warning messages (e.g.,
-   `.gclient configuration mismatches (missing target_os = ["win"])` or
-   cross-compilation warnings).
-2. Present these warnings clearly to the user in the chat.
-3. Ask the user for their decision **after** they have seen the warnings, so
-   they know exactly what they are agreeing to.
+- `args.gn` differs from the builder's: re-run with `--keep-gn-args` if you
+  believe the differences in the current `args.gn` are intentional. Otherwise,
+  ask the user before passing `--overwrite-gn-args` (replaces local `args.gn`).
+- Coverage branch check: re-run with `--no-coverage-instrumentation`.
+- `.gclient` mismatch (e.g. missing `target_os = ["win"]`): the checkout lacks
+  what the builder needs. Show the warning to the user and ask how to proceed.
+- Builder config may not fit this machine: show the warning to the user. Only if
+  they confirm it's expected (e.g. Windows cross-compile from Linux), re-run
+  with `--skip-config-validation`, and keep passing it on later runs.
 
-### 2. Smart Use of the `--force` Flag
+**DO NOT** simply ask the user "Should I proceed?". Show the warning first, so
+they know what they are agreeing to.
 
-The `--force` (or `-f`) flag bypasses all prompts. To avoid annoying the user
-with repeated prompts while also ensuring they see important warnings:
+### 2. Don't Use `--force`
 
-- **First Run:** **NEVER** use the `--force` flag on the initial UTR run unless
-  the user has already explicitly authorized it. Run UTR normally so that any
-  configuration mismatches or warnings are caught and prompted.
-- **Subsequent Runs:** If you need to run UTR multiple times (e.g., during
-  iterative debugging or multiple test runs) and the user **has already accepted
-  all the warnings** in a previous run, you **SHOULD** append the `--force` flag
-  to all subsequent UTR runs. This prevents the user from having to approve the
-  same warnings repeatedly.
-- **Safety Constraint:** **ONLY** use `--force` if the user has already seen and
-  accepted *all* the warnings. Never use it to preemptively override warnings
-  that the user has not yet approved at least once.
+`--force` (or `-f`) silently takes every prompt's default, including the checks
+above. Don't use it unless the user explicitly asks. In your final message,
+quote every warning UTR printed and the flag that got past it.
