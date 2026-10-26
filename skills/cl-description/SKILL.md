@@ -14,9 +14,10 @@ Because LLMs cannot reliably hard-wrap text at precisely 72 characters, you
 **MUST** mathematically format your draft before presenting the final response.
 Use the provided Python script
 `agents/shared/skills/cl-description/scripts/wrap_lines.py` via your execution
-tools. Pre-requisite: Save your draft to a file (e.g. `draft.txt`). Example
+tools. Pre-requisite: Save your draft to a file in your scratch space (e.g.
+`<scratch_dir>/draft.txt`), never inside the repository working tree. Example
 usage:
-`vpython3 agents/shared/skills/cl-description/scripts/wrap_lines.py draft.txt`
+`vpython3 agents/shared/skills/cl-description/scripts/wrap_lines.py <scratch_dir>/draft.txt`
 Final output should be the code block containing the mathematically formatted
 text.
 
