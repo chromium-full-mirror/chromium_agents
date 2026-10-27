@@ -71,6 +71,8 @@ depot_tools.
   `--host https://chromium-review.googlesource.com`).
 - **Use JSON Output**: Always use the `--json_file=<path>` flag when querying
   changes or fetching metadata to obtain structured, machine-readable output.
+- **Fence Code in Comments**: Gerrit does not render indented blocks as code.
+  Wrap multi-line code in comment messages in triple-backtick fences.
 
 > [!CAUTION] **NEVER** publish comments or messages (e.g. `addpatchsetcomment`,
 > `addMessage`, or via `rawapi`) or directly reply to comments if non-author
