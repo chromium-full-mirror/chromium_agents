@@ -1,6 +1,6 @@
 ---
 name: git-cl-helper
-description: Use this skill for the Chromium Gerrit CL workflow with Git - committing changes, uploading CLs, triggering try jobs, and polling presubmit results.
+description: Use this skill for the Chromium Gerrit CL workflow with Git - committing changes, uploading CLs, triggering try jobs, waiting for CQ dry runs, and polling presubmit results.
 ---
 
 # Git CL Helper Skill
@@ -147,6 +147,12 @@ This will print the status (e.g., `STATUS: passed`, `STATUS: failed`,
 `STATUS: running`) and detailed error logs if any presubmit build failed,
 fetched via `bb get`. For more detailed error messages, see the
 `luci-test-results` skill.
+
+### Waiting for a CQ Dry Run
+
+To wait for a CQ dry run to finish, run
+`vpython3 tools/gerrit/wait_for_cq_dryrun.py` in the foreground (not `--bg`). It
+exits non-zero if any builder failed. It triggers a dry run if none is active.
 
 ### Getting and Replying to Comments
 
