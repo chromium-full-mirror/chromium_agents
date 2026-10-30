@@ -16,7 +16,8 @@ If any of the following are missing or ambiguous after checking your context,
 **STOP and ask the user for clarification** through a series of prompts:
 
 - **The "Why":** If the technical rationale or motivation isn't explicitly clear
-  from the current context or diff.
+  from the current context or diff (not needed if the change is self-
+  explanatory from the subject line).
 - **Component Tag:** Deduce the bracketed subject prefix from explicit user
   input or clear evidence from the current change. If no single tag is clearly
   supported, first ask the user if having no tag is okay or which tag to use
@@ -100,12 +101,17 @@ reference. Determine whether to use `Bug:` or `Fixed:` from the current task.
 
 ### 3. Body Content Requirements
 
+- **Self-Explanatory Changes:** OMIT the description body entirely if the
+  subject line is sufficient to understand a trivial change. Do not add filler
+  paragraphs that merely rephrase the subject line.
 - **Content over Code:** Do not just list what changed. Focus on **why** it was
   necessary.
-- **Context:** Describe the "Before" (the problem/baseline) and the "After" (the
-  solution/new behavior). Usually both can be described in a single sentence.
-  Avoid creating dedicated "Before" and "After" paragraphs if that leads to the
-  same idea repeated twice.
+- **Context:** When a body is necessary, describe the "Before" (the
+  problem/baseline) and the "After" (the solution/new behavior). Usually both
+  can be described in a single sentence. Avoid creating dedicated "Before" and
+  "After" paragraphs if that leads to the same idea repeated twice. Focus on
+  high-level ideas and avoid code references, unless absolutely necessary to
+  convey the idea.
 - **Documentation Links:** Do not include any links (e.g., to design docs or
   other CLs) unless specifically requested. Use the format
   `https://crrev.com/c/NUMBER` for Gerrit CL references.
@@ -146,10 +152,7 @@ ______________________________________________________________________
 ```
 [Component] [Short summary of change (< 50 chars)]
 
-[Description explaining the "Why" and "How". Focus on rationale,
-previous behavior, and the impact of the change. Wrap this
-block strictly at 72 characters. You can omit this body if the
-diff is short and self-explanatory.]
+[Description (OMIT if subject line is self-explanatory)]
 
 Bug: [b:ID or ID]
 Test: [Manual test commands or verification steps]
