@@ -10,7 +10,7 @@ trigger for automated infrastructure.
 Before generating the final draft, first try to deduce the required details from
 your current context (and inspect the local diff only if the changes are not
 already in context). Do not invoke external history search skills (such as
-`history-rag`) or search repository commit logs to infer commit message fields.
+`history-rag`) or search repository commit logs to infer bug IDs or rationale.
 
 If any of the following are missing or ambiguous after checking your context,
 **STOP and ask the user for clarification** through a series of prompts:
@@ -18,19 +18,19 @@ If any of the following are missing or ambiguous after checking your context,
 - **The "Why":** If the technical rationale or motivation isn't explicitly clear
   from the current context or diff (not needed if the change is self-
   explanatory from the subject line).
-- **Component Tag:** Deduce the bracketed subject prefix from explicit user
-  input or clear evidence from the current change. If no single tag is clearly
-  supported, first ask the user if having no tag is okay or which tag to use
-  before going through the local selection history workflow.
+- **Component Tag:** Deduce the bracketed subject prefix (and its casing, e.g.,
+  `[Omnibox]` vs. `[wasm]`) from explicit user input, repository rules, or clear
+  evidence from the current change (in a Git checkout, checking
+  `git --no-pager log -n 5 --oneline -- <paths>` on the modified files for
+  precedence if needed). If no single tag is clearly supported, first ask the
+  user if having no tag is okay or which tag to use before going through the
+  local selection history workflow.
 - **Bug ID:** If no bug number was mentioned in the context, first ask the user
   if having no bug is okay or if one should be associated before going through
   the local selection history workflow.
 - **Internal vs. Public Bug:** If a bare bug ID is present without a clear
   tracker indicator (such as `b/`, `b:`, or `crbug.com/`), confirm if it's a
   public Chromium bug or an internal Buganizer issue.
-- **Manual Testing:** If no test commands were successfully run, ask the user
-  how they verified the change to populate the `Test:` footer, or if they want
-  to leave it empty.
 - **Histogram Obsoletion:** If non-expired UMA histograms are removed or
   renamed, and the obsoletion reason or replacement is unclear, ask the user.
 
@@ -90,9 +90,10 @@ reference. Determine whether to use `Bug:` or `Fixed:` from the current task.
 - **72-Column Wrap:** Every line (Subject and Body) **MUST** be hard-wrapped at
   72 characters (exception: footer tags like `OBSOLETE_HISTOGRAM` must remain on
   a single line).
-- **Subject Line:** A single, concise summary. Prefix it with the relevant
-  component in brackets, e.g., `[Omnibox]: ...`. The entire subject line
-  **MUST** be under 50 characters if possible, and no more than 72 characters.
+- **Subject Line:** A single, concise summary prefixed with the relevant
+  component in brackets (no colon after the closing bracket), e.g.,
+  `[Omnibox] ...` or `[wasm] ...`. The entire subject line should be under 50
+  characters if possible, and **MUST** be no more than 72 characters.
 - **Subject Spacing:** There **MUST** be exactly one blank line after the
   subject.
 - **Footer Spacing:** There should be no blank lines within the footer block.
@@ -128,9 +129,9 @@ reference. Determine whether to use `Bug:` or `Fixed:` from the current task.
   `Bug:` line at all. Do not write `Bug: None`.
 - **Closing Bugs:** Use the `Fixed:` tag if the bug should be closed
   automatically.
-- **Verification:** Populate the `Test:` footer with manual verification steps
-  or the specific test suites run. If the user chooses to leave testing empty,
-  omit the `Test:` line.
+- **Verification (`Test:`, Optional):** Omit the `Test:` footer by default. Only
+  include `Test:` when requested by the user or required by a specific subsystem
+  to document manual verification steps.
 - **Histogram Obsoletion (UMA):** When removing or renaming non-expired
   histograms from `histograms.xml` (including patterned variants or suffixes),
   add obsoletion tags to the footer explaining why and when (YYYY-MM) they were
@@ -144,17 +145,22 @@ reference. Determine whether to use `Bug:` or `Fixed:` from the current task.
     exceeds 72 characters.
   - **Expired Histograms:** Can be omitted if the removed histogram was already
     expired.
+- **Repository & Gerrit Trailers:** Preserve existing `Change-Id:` lines and any
+  repository-mandated trailer lines (such as `TAG=` or `CONV=`) at the bottom of
+  the footer block.
 
 ______________________________________________________________________
 
 ## Final Message Template:
+
+Include only the footer lines that apply to the change:
 
 ```
 [Component] [Short summary of change (< 50 chars)]
 
 [Description (OMIT if subject line is self-explanatory)]
 
-Bug: [b:ID or ID]
-Test: [Manual test commands or verification steps]
-OBSOLETE_HISTOGRAM[HistogramName]=[Reason or replacement (single line)]
+Bug: [b:ID or ID (or Fixed:)]
+Test: [Optional: manual verification steps if requested]
+OBSOLETE_HISTOGRAM[HistogramName]=[Optional: reason or replacement (single line)]
 ```

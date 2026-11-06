@@ -27,5 +27,8 @@ See `git-cl-helper` for uploading:
 
 - **Initial upload**: `git cl upload` uses the git commit description (do not
   pass `--title`).
-- **Existing CL**: Run `git cl description -n +` to set the Gerrit description
-  from the latest git commit.
+- **Existing CL**: Omit `--commit-description` on subsequent patchset uploads
+  unless the CL description itself needs updating. Before running
+  `git cl description -n +` (which overwrites the Gerrit description with
+  `HEAD`'s commit message), inspect `git cl description -d` and carry over any
+  online edits and the `Change-Id:` footer into the commit message being synced.
