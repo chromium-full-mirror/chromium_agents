@@ -13,7 +13,7 @@ provided with a link or ID:
      --query "change:<id>"
    ```
 2. **Fetch File Contents**: Retrieve the content of specific files modified in
-   the CL:
+   the CL (or use `--path /COMMIT_MSG` to inspect the commit message):
    ```bash
    vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
      content \
@@ -26,16 +26,25 @@ provided with a link or ID:
 4. **Add Draft Review Comment**: Create a draft comment containing the review
    findings and ask the user to review and post it in Gerrit (never publish
    comments directly with `addpatchsetcomment` if non-author humans are
-   involved):
+   involved). Run one invocation per comment; the command's response is the
+   created draft (no need to re-fetch to confirm):
    ```bash
    vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
-     rawapi \
+     adddraftcomment \
      --host https://chromium-review.googlesource.com \
-     --path "/changes/<change_id>/revisions/current/drafts" \
-     --method PUT \
-     --accept_status 200,201 \
-     --body '{"path": "/PATCHSET_LEVEL", "message": "Review findings: ..."}'
+     --change <change_id> \
+     --revision current \
+     -m "Review findings: ..."
    ```
+   - For file/line comments, add `--path <file_path>` and
+     `--line <line_number>`.
+   - Special paths:
+     - `/PATCHSET_LEVEL`: Comment on the overall revision (the default if
+       `--path` is omitted).
+     - `/COMMIT_MSG`: Comment on the commit message. Because Gerrit prepends
+       header lines (`Parent:`, `Author:`, etc.), take line numbers from
+       `content --path /COMMIT_MSG` rather than counting lines in the local
+       commit message.
 
 ## 2. Shepherding & Submission Workflow
 

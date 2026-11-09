@@ -60,6 +60,9 @@ ______________________________________________________________________
 
 - **View the content of a specific file in a change:**
 
+  To inspect the commit message as seen by Gerrit (including header lines for
+  line-accurate commenting), use `--path /COMMIT_MSG`.
+
   **Note:** This command does not work with the `--json_file` flag, instead use
   stdout redirection (`>`).
 
@@ -102,18 +105,66 @@ ______________________________________________________________________
 
 ### 2. Reviewing and Voting
 
-- **Create a draft comment (patchset-level, line-level, or reply):**
-  ```bash
-  vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
-    rawapi \
-    --host https://chromium-review.googlesource.com \
-    --path "/changes/<change_id>/revisions/<revision>/drafts" \
-    --method PUT \
-    --accept_status 200,201 \
-    --body '{"path": "/PATCHSET_LEVEL", "message": "Review findings: <message>"}'
-  ```
-  *(For line comments or replies, set `"path": "<file_path>"`, `"line": <line>`,
-  and/or `"in_reply_to": "<comment_id>"` in `--body`.)*
+- **Create a draft comment (`adddraftcomment`):** Create a draft comment on a
+  revision. The command's response is the created draft JSON (CommentInfo).
+  - **Patchset-level draft:** `--path` defaults to `/PATCHSET_LEVEL` when
+    omitted, and `--revision` defaults to `current`.
+    ```bash
+    vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+      adddraftcomment \
+      --host https://chromium-review.googlesource.com \
+      --change <change_id> \
+      --revision current \
+      -m "Review findings: <message>"
+    ```
+  - **File- and line-level draft:** Specify `--path`, `-l`/`--line`, and
+    optionally `--side` (`REVISION` or `PARENT`; Gerrit defaults to `REVISION`).
+    Set the resolution state with `--unresolved` or `--resolved`.
+    ```bash
+    vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+      adddraftcomment \
+      --host https://chromium-review.googlesource.com \
+      --change <change_id> \
+      --path <file_path> \
+      --line <line_number> \
+      --side REVISION \
+      --unresolved \
+      -m "<comment_message>"
+    ```
+  - **Reply to an existing comment:** Specify `--in-reply-to <uuid>`. If
+    `--path` and `--revision` are omitted, `adddraftcomment` automatically
+    resolves the parent comment's path, line/range, side, and revision.
+    ```bash
+    vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+      adddraftcomment \
+      --host https://chromium-review.googlesource.com \
+      --change <change_id> \
+      --in-reply-to <comment_uuid> \
+      --resolved \
+      -m "Done"
+    ```
+  - **Richer fields via `--body` (`range`, `fix_suggestions`):** Pass a JSON
+    object to `--body` to provide fields not covered by dedicated flags, such as
+    `range` or `fix_suggestions`. CLI flags take precedence over keys in
+    `--body` (e.g., `-m`/`--message` or `--path` will override `message` or
+    `path` in `--body`).
+    ```bash
+    vpython3 agents/shared/skills/gerrit-cli/scripts/gerrit_client_wrapper.py \
+      adddraftcomment \
+      --host https://chromium-review.googlesource.com \
+      --change <change_id> \
+      --path <file_path> \
+      -m "Consider renaming this variable." \
+      --body '{"range": {"start_line": 15, "end_line": 15, "start_character": 4, "end_character": 12}, "fix_suggestions": [{"description": "Rename variable", "replacements": [{"path": "<file_path>", "range": {"start_line": 15, "end_line": 15, "start_character": 4, "end_character": 12}, "replacement": "new_name"}]}]}'
+    ```
+  - **Special Paths:**
+    - `/PATCHSET_LEVEL`: Represents a review comment on the whole patchset
+      rather than a file line. This is the default `--path` if omitted (unless
+      replying to a comment).
+    - `/COMMIT_MSG`: Represents the commit message. Line numbers include
+      Gerrit's generated header lines (`Parent:`, `Author:`, `Commit:`, etc.).
+      Always take line numbers from `content --path /COMMIT_MSG` rather than
+      counting lines in the local commit message.
 - **Add a published patchset-level comment (only when no non-author humans are
   involved):**
   ```bash

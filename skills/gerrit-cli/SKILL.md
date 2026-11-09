@@ -73,10 +73,13 @@ depot_tools.
   changes or fetching metadata to obtain structured, machine-readable output.
 - **Fence Code in Comments**: Gerrit does not render indented blocks as code.
   Wrap multi-line code in comment messages in triple-backtick fences.
+- **Prefer Dedicated Subcommands**: Prefer dedicated subcommands (changes,
+  comments, content, patch, checks, relatedchanges, adddraftcomment) over
+  `rawapi`; use `rawapi` only when no subcommand exists.
 
 > [!CAUTION] **NEVER** publish comments or messages (e.g. `addpatchsetcomment`,
 > `addMessage`, or via `rawapi`) or directly reply to comments if non-author
 > human reviewers have commented on the CL. Using an agent to autonomously reply
 > to a human is a violation of Chromium's code of conduct. Instead, create draft
-> comments (e.g. via `rawapi` or `git cl comments --reply-to`) and ask the user
-> to review and post them.
+> comments (e.g. via [`adddraftcomment`](references/commands.md) or
+> `git cl comments --reply-to`) and ask the user to review and post them.
