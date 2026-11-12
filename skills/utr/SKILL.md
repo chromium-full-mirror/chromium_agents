@@ -1,96 +1,51 @@
 ---
 name: utr
 description: >-
-  UTR (Universal Test Runner) is a tool to locally compile and/or run tests the
-  same way it's done on Chromium CI/try builders (aka "bots"). It's particularly
-  useful for reproducing bot failures or running tests on platforms you don't
-  have access to locally.
+  Compiles local changes and/or runs Chromium tests in the bot fleet using
+  CI/try builder configurations via the Universal Test Runner (UTR). Use
+  proactively to reproduce or investigate bot build/test failures, or as a
+  much quicker way to check local changes against a single builder than a
+  full CQ run.
 ---
+
+## When to Use UTR (Proactive Workflows)
+
+UTR compiles local changes (using the builder's exact `gn_args` and `.gclient`
+validation) and/or executes tests in the bot fleet (via Swarming) matching
+Chromium's CI and Try builders. Proactively use UTR when:
+
+- **Reproducing or Investigating Bot Build/Test Failures:** A compile or test
+  failure occurred on a CQ run, trybot, or CI builder that does not reproduce in
+  standard local `out/Default` builds (e.g. due to bot-specific `gn_args`,
+  sanitizers, or platform/OS differences). Pass `-n {count}` to repeat the run
+  until the first failure when reproducing flaky tests.
+- **Quick Single-Builder Verification:** Checking local changes (either
+  compilation via `compile` or Swarming test execution via `compile-and-test`)
+  against a specific builder (prefer `-B try`) much faster than running a full
+  CQ dry run.
 
 ## Basic Usage
 
-The UTR tool is located at `tools/utr/run.py`. Always run it with `vpython3`.
-
-When operating in remote or non-interactive workspace environments like Cider G,
-ensure `depot_tools` is in your `PATH` and authenticate before invoking UTR:
+Run `tools/utr/run.py` with `vpython3` from the Chromium `src/` checkout root:
 
 ```sh
-luci-auth login -scopes https://www.googleapis.com/auth/userinfo.email
-vpython3 tools/utr/run.py -B <bucket> -b <builder> -t <test_suite> <action>
+vpython3 tools/utr/run.py -B {bucket} -b {builder} -t {test_suite} {action}
 ```
 
-### Actions
+Read `tools/utr/README.md` locally (or run `vpython3 tools/utr/run.py -h` and
+`vpython3 tools/utr/run.py compile -h`) for:
 
-- `compile`: Only compile the targets.
-- `test`: Only run the tests (assumes already compiled).
-- `compile-and-test`: Compile and then run tests.
-
-*Note: For `test` and `compile-and-test` actions, UTR will automatically track
-and wait for all distributed Swarming shards to complete execution on the bot
-farm and output the final aggregated results URL before exiting.*
-
-### Common Flags
-
-- `-B <bucket>`: The bucket name (e.g., `ci` or `try`).
-- `-b <builder>`: The builder name (e.g., `Linux Tests`, `Win10 Tests x64`).
-- `-t <test_suite>`: The test suite to run (e.g., `viz_unittests`,
-  `url_unittests`).
-- `--build-dir <dir>` or `-o <dir>`: The build directory to use for compiling
-  and invoking test targets. Will use a build dir in `//out/` named after the
-  builder if not specified: `//out/UTR${{builder_name}}`
-- `--force` or `-f`: Takes every config-mismatch prompt's default, silently
-  skipping the checks below. Don't use it unless the user explicitly asks.
-- `--keep-gn-args` / `--overwrite-gn-args`: If the local `args.gn` differs from
-  the builder's, keep it or replace it with the builder's args.
-- `-n N`: Runs the build/test command N times without cleaning the build dir,
-  and exits on the first failure.
-- `--no-rbe`: Disables remote execution (RBE) and forces local compilation.
-- `--`: Any args after this will be passed directly to the test executable.
-
-## Examples and Advanced Usage
-
-More information including examples with builder names and advanced usage can be
-found at
-[tools/utr/README.md](https://chromium.googlesource.com/chromium/src/+/main/tools/utr/README.md).
-
-Information about cross-compiling Windows targets on Linux can be found at
-[docs/win_cross.md](https://chromium.googlesource.com/chromium/src/+/main/docs/win_cross.md).
-
-## Troubleshooting in Non-Interactive Environments
-
-When running UTR inside non-interactive remote sessions, you may encounter
-BeyondCorp / Context Aware Access (CAA) authentication blockers, missing remote
-`.cipd_bin/` packages, `.gclient` toolchain mismatches, or RBE CAS syncing
-issues:
-
-1. **Explicit Re-authentication:** If fetching binaries or updating datasets
-   stalls or raises an authentication failure, explicitly generate a fresh
-   Context Aware Access token in the terminal:
-   ```sh
-   luci-auth login -scopes https://www.googleapis.com/auth/userinfo.email
-   ```
-2. **Forcing Narrow Execution Scope:** Avoid broad isolation failures by always
-   supplying specific test targets:
-   ```sh
-   vpython3 tools/utr/run.py -t <test_suite> -p chromium -B try -b <builder> compile
-   ```
-3. **Missing Target OS Toolchains (e.g., Android/iOS):** If GN generation fails
-   with `Missing native Android toolchain support` (or similar `target_os`
-   assertions), ensure your workspace's `.gclient` configuration includes the
-   necessary platform in `target_os` and run `gclient sync`:
-   ```python
-   solutions = [
-     ...
-   ]
-   target_os = ["linux", "android"]
-   ```
-4. **Missing CAS Inputs on Remote Workers (RBE Failures):** If remote
-   compilation fails because RBE cloud workers cannot find local Cog virtual
-   files (e.g., `build/util/LASTCHANGE.dummy`), pass `--no-rbe` to force local
-   execution where the files are successfully present:
-   ```sh
-   vpython3 tools/utr/run.py --no-rbe -p chromium -B ci -b <builder> -t <test> compile-and-test
-   ```
+- [Command-line Usage](https://chromium.googlesource.com/chromium/src/+/main/tools/utr/README.md#command-line-usage):
+  common `try` builders, host cross-compilation support, and `.gclient` setup.
+- [Actions and Common Flags](https://chromium.googlesource.com/chromium/src/+/main/tools/utr/README.md#actions-and-common-flags):
+  `compile` / `test` / `compile-and-test` actions, `-n` flake repetition,
+  compile subparser flags (such as `--no-rbe`, placed after the action), and
+  `--` test arguments.
+- [Custom Builder Configs](https://chromium.googlesource.com/chromium/src/+/main/tools/utr/README.md#custom-builder-configs)
+  and
+  [Git Bisect](https://chromium.googlesource.com/chromium/src/+/main/tools/utr/README.md#git-bisect).
+- [Troubleshooting](https://chromium.googlesource.com/chromium/src/+/main/tools/utr/README.md#troubleshooting):
+  `luci-auth` login and `--no-rbe` for missing CAS inputs in Cog workspaces.
 
 ## Guidelines for AI Agents (User Interaction & Prompts)
 
@@ -120,3 +75,9 @@ they know what they are agreeing to.
 `--force` (or `-f`) silently takes every prompt's default, including the checks
 above. Don't use it unless the user explicitly asks. In your final message,
 quote every warning UTR printed and the flag that got past it.
+
+### 3. Wait for Swarming Completion
+
+`test` and `compile-and-test` block until all Swarming shards finish and print
+the final results URL before exiting. Wait for the command to complete rather
+than backgrounding or killing the run early.
