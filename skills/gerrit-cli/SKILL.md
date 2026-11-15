@@ -65,6 +65,12 @@ depot_tools.
 
 - If checks cannot be fetched, report them as unavailable, not empty.
 
+- `checks` returns automated static-analysis findings from Gerrit's Findings
+  plugin, not LUCI Buildbucket tryjobs. To investigate LUCI tryjob or CI builds
+  for a change, load the `luci` skill if available; otherwise use the
+  `luci-test-results` and `buildbucket` skills (or `bb` and `rdb` from
+  `depot_tools`).
+
 ## Gotchas & Environment Constraints
 
 - **Specify Host**: Always supply the `--host` flag explicitly (e.g.

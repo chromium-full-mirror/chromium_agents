@@ -55,8 +55,12 @@ ______________________________________________________________________
   `--change` is required. `--revision` is optional and defaults to `current`.
   This writes the unchanged JSON array of check runs to `--json_file`.
 
-  Requires Gerrit's Findings plugin. This does not include all try-job results;
-  empty findings do not mean all try jobs passed.
+  Requires Gerrit's Findings plugin (`list_checks`), which returns static
+  analysis findings only and does not include LUCI Buildbucket tryjobs; empty
+  findings do not mean all try jobs passed. To inspect LUCI tryjob or CI builds
+  for a change, load the `luci` skill if available; otherwise use the
+  `luci-test-results` and `buildbucket` skills (or `bb` and `rdb` from
+  `depot_tools`).
 
 - **View the content of a specific file in a change:**
 

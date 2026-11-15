@@ -144,15 +144,19 @@ URL such as `https://crrev.com/c/1234567` or
 `https://chromium-review.googlesource.com/1234567`.
 
 This will print the status (e.g., `STATUS: passed`, `STATUS: failed`,
-`STATUS: running`) and detailed error logs if any presubmit build failed,
-fetched via `bb get`. For more detailed error messages, see the
-`luci-test-results` skill.
+`STATUS: running`) and high-level error logs if any presubmit build failed,
+fetched via `bb get`. To investigate failing trybots or test results in detail,
+load the `luci` skill if available; otherwise use the `luci-test-results` and
+`buildbucket` skills (or `bb` and `rdb` from `depot_tools`).
 
 ### Waiting for a CQ Dry Run
 
 To wait for a CQ dry run to finish, run
 `vpython3 tools/gerrit/wait_for_cq_dryrun.py` in the foreground (not `--bg`). It
-exits non-zero if any builder failed. It triggers a dry run if none is active.
+exits non-zero if any builder failed, in which case investigate the failing
+tryjobs using the `luci` skill if available, or the `luci-test-results` and
+`buildbucket` skills (or `bb` and `rdb`) as above. It triggers a dry run if none
+is active.
 
 ### Getting and Replying to Comments
 
