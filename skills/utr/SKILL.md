@@ -24,6 +24,17 @@ Chromium's CI and Try builders. Proactively use UTR when:
   against a specific builder (prefer `-B try`) much faster than running a full
   CQ dry run.
 
+## Prerequisites
+
+Before invoking UTR, verify the checkout state (`git status -uno` in `src/`) and
+confirm `tools/utr/run.py` exists (run `gclient sync` if missing). In remote or
+non-interactive environments, check `luci-auth info` before running an
+interactive `luci-auth login`:
+
+```sh
+luci-auth info || luci-auth login -scopes https://www.googleapis.com/auth/userinfo.email
+```
+
 ## Basic Usage
 
 Run `tools/utr/run.py` with `vpython3` from the Chromium `src/` checkout root:
@@ -32,20 +43,40 @@ Run `tools/utr/run.py` with `vpython3` from the Chromium `src/` checkout root:
 vpython3 tools/utr/run.py -B {bucket} -b {builder} -t {test_suite} {action}
 ```
 
+### Mapping LUCI Build Failure URLs & Choosing Builders
+
+- **From a failing LUCI Milo URL**
+  (`https://ci.chromium.org/ui/p/chromium/builders/{bucket}/{builder}/{build}`):
+  - `-B {bucket}`: The bucket segment (`ci` or `try`).
+  - `-b {builder}`: The URL-decoded builder name (e.g., `Linux%20Tests` ->
+    `'Linux Tests'`, `linux-rel` -> `linux-rel`).
+  - `-t {test_suite}`: The failing step name before `(with patch)` or OS/GPU
+    suffixes (e.g., `browser_tests (with patch) on Ubuntu-22.04` ->
+    `browser_tests`).
+- **Choosing a builder for a desired `args.gn` preset:** Prefer selecting an
+  existing builder (see standard `try` builders in `tools/utr/README.md`, or a
+  `(dbg)` / sanitizer builder such as `'Linux Tests (dbg)(1)'` or
+  `linux_chromium_asan_rel_ng`) over hand-editing Starlark configs.
+
+### Reference Documentation (`tools/utr/README.md`)
+
 Read `tools/utr/README.md` locally (or run `vpython3 tools/utr/run.py -h` and
 `vpython3 tools/utr/run.py compile -h`) for:
 
 - [Command-line Usage](https://chromium.googlesource.com/chromium/src/+/main/tools/utr/README.md#command-line-usage):
   common `try` builders, host cross-compilation support, and `.gclient` setup.
 - [Actions and Common Flags](https://chromium.googlesource.com/chromium/src/+/main/tools/utr/README.md#actions-and-common-flags):
-  `compile` / `test` / `compile-and-test` actions, `-n` flake repetition,
-  compile subparser flags (such as `--no-rbe`, placed after the action), and
-  `--` test arguments.
+  `compile` / `test` / `compile-and-test` actions, passing source test file
+  paths to `-t`, `-n` flake repetition, `--reuse-task` (placed before `test`),
+  `--dimension` / `--shards` / `--omit-default-test-args`, compile subparser
+  flags (such as `--no-rbe`, placed after the action), and `--` test arguments.
 - [Custom Builder Configs](https://chromium.googlesource.com/chromium/src/+/main/tools/utr/README.md#custom-builder-configs)
   and
   [Git Bisect](https://chromium.googlesource.com/chromium/src/+/main/tools/utr/README.md#git-bisect).
 - [Troubleshooting](https://chromium.googlesource.com/chromium/src/+/main/tools/utr/README.md#troubleshooting):
-  `luci-auth` login and `--no-rbe` for missing CAS inputs in Cog workspaces.
+  `luci-auth` login, `--no-rbe` for missing CAS inputs in Cog workspaces,
+  separate `out/UTR<builder_name>` build directories, and Swarming `data` /
+  `.isolate` dependency isolation.
 
 ## Guidelines for AI Agents (User Interaction & Prompts)
 
